@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sinta — Email Exposure Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#12213A;
+    --navy-soft:#1D3157;
+    --paper:#FAF7F0;
+    --paper-dim:#F0EBDD;
+    --ink:#1B1B18;
+    --ink-soft:#5B5A52;
+    --gold:#C98A2E;
+    --safe:#1F7A5C;
+    --safe-bg:#E7F3EC;
+    --danger:#B5432B;
+    --danger-bg:#FBEAE3;
+    --line:#D9D2BE;
+    --radius:2px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:48px 20px 80px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;}
+  }
+
+  .brandbar{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:36px;
+  }
+  .brandbar .mark{
+    width:26px;height:26px;
+    border:1.5px solid var(--navy);
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Fraunces',serif;
+    font-size:14px;
+    color:var(--navy);
+  }
+  .brandbar span{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+
+  h1{
+    font-family:'Fraunces',serif;
+    font-optical-sizing:auto;
+    font-weight:500;
+    font-size:clamp(32px,5vw,46px);
+    line-height:1.08;
+    letter-spacing:-0.01em;
+    color:var(--navy);
+    text-align:center;
+    max-width:620px;
+    margin:0 0 14px;
+  }
+  h1 em{
+    font-style:italic;
+    color:var(--gold);
+  }
+  .sub{
+    font-size:15px;
+    color:var(--ink-soft);
+    text-align:center;
+    max-width:480px;
+    line-height:1.55;
+    margin:0 0 40px;
+  }
+
+  form{
+    width:100%;
+    max-width:480px;
+    display:flex;
+    gap:0;
+    border:1.5px solid var(--navy);
+    background:#fff;
+  }
+  input[type=email]{
+    flex:1;
+    border:none;
+    outline:none;
+    background:transparent;
+    padding:16px 18px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:15px;
+    color:var(--ink);
+  }
+  input[type=email]::placeholder{color:#9C9788;}
+  button{
+    border:none;
+    background:var(--navy);
+    color:var(--paper);
+    padding:0 26px;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:14px;
+    letter-spacing:0.02em;
+    cursor:pointer;
+    transition:background 0.15s ease;
+  }
+  button:hover:not(:disabled){background:var(--navy-soft);}
+  button:disabled{opacity:0.55;cursor:default;}
+  button:focus-visible, input:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+
+  .consent{
+    max-width:480px;
+    width:100%;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin-top:12px;
+    line-height:1.5;
+  }
+
+  /* ---- receipt ---- */
+  .receipt-wrap{
+    width:100%;
+    max-width:420px;
+    margin-top:44px;
+    display:none;
+  }
+  .receipt-wrap.show{display:block;animation:rise 0.4s ease both;}
+  @keyframes rise{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+  .receipt{
+    background:#fff;
+    border:1px solid var(--line);
+    box-shadow:0 1px 0 var(--line), 0 18px 40px -24px rgba(18,33,58,0.35);
+    padding:0;
+    position:relative;
+  }
+  .receipt::before{
+    content:"";
+    display:block;
+    height:6px;
+    background-image:repeating-linear-gradient(-45deg, var(--paper) 0 6px, transparent 6px 12px);
+    background-color:#fff;
+  }
+  .r-head{
+    padding:22px 26px 16px;
+    border-bottom:1px dashed var(--line);
+    text-align:center;
+  }
+  .r-head .mark{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .r-head .verdict{
+    font-family:'Fraunces',serif;
+    font-size:22px;
+    font-weight:600;
+  }
+  .r-head .verdict.safe{color:var(--safe);}
+  .r-head .verdict.danger{color:var(--danger);}
+  .r-head .verdict.err{color:var(--ink-soft);}
+
+  .r-body{padding:20px 26px;}
+  .r-row{
+    display:flex;
+    justify-content:space-between;
+    gap:16px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    padding:7px 0;
+    border-bottom:1px dotted var(--line);
+    color:var(--ink);
+  }
+  .r-row:last-child{border-bottom:none;}
+  .r-row .k{color:var(--ink-soft);}
+  .r-row .v{text-align:right;max-width:60%;word-break:break-word;}
+
+  .breach-list{
+    list-style:none;
+    margin:12px 0 0;
+    padding:0;
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  .breach-list li{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    background:var(--danger-bg);
+    color:var(--danger);
+    padding:4px 9px;
+    border:1px solid #EFCFC0;
+  }
+
+  .r-foot{
+    padding:16px 26px 22px;
+    border-top:1px dashed var(--line);
+  }
+  .r-foot p{
+    margin:0;
+    font-size:12.5px;
+    line-height:1.55;
+    color:var(--ink-soft);
+  }
+  .r-foot .stub{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    color:#B4AF9E;
+    text-align:center;
+    margin-top:14px;
+    letter-spacing:0.04em;
+  }
+
+  .steps{
+    margin-top:10px;
+    padding-left:0;
+    list-style:none;
+  }
+  .steps li{
+    font-size:12.5px;
+    color:var(--ink);
+    padding-left:18px;
+    position:relative;
+    margin-top:6px;
+    line-height:1.5;
+  }
+  .steps li::before{
+    content:"–";
+    position:absolute;left:0;
+    color:var(--gold);
+  }
+
+  .loading{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+    text-align:center;
+    padding:24px 0;
+    display:none;
+  }
+  .loading.show{display:block;}
+
+  footer{
+    margin-top:56px;
+    max-width:480px;
+    text-align:center;
+    font-size:11.5px;
+    color:#9C9788;
+    line-height:1.6;
+  }
+  footer a{color:var(--ink-soft);}
+</style>
+</head>
+<body>
+
+  <div class="brandbar">
+    <div class="mark">S</div>
+    <span>Sinta · Digital Safety Check</span>
+  </div>
+
+  <h1>Has your email been part of a <em>data leak?</em></h1>
+  <p class="sub">Check your email against known public data-breach records. Nothing you type here is stored, logged, or sent anywhere except the breach-lookup service itself.</p>
+
+  <form id="checkForm">
+    <input type="email" id="emailInput" placeholder="juan.delacruz@gmail.com" required autocomplete="off" spellcheck="false">
+    <button type="submit" id="checkBtn">Check</button>
+  </form>
+  <p class="consent">By checking, your email is sent directly from your browser to <strong>XposedOrNot</strong>, a free public breach-lookup service, over an encrypted connection. This tool keeps no copy.</p>
+
+  <div class="loading" id="loading">checking public breach records …</div>
+
+  <div class="receipt-wrap" id="receiptWrap">
+    <div class="receipt" id="receipt"></div>
+  </div>
+
+  <footer>
+    Not a replacement for official advice. If money or a government ID was involved, report to the <a href="https://www.pnpacg.ph/" target="_blank" rel="noopener">PNP Anti-Cybercrime Group</a> or file a complaint with the <a href="https://www.privacy.gov.ph/" target="_blank" rel="noopener">National Privacy Commission</a>. Breach data via XposedOrNot's free public API.
+  </footer>
+
+<script>
+const form = document.getElementById('checkForm');
+const input = document.getElementById('emailInput');
+const btn = document.getElementById('checkBtn');
+const loading = document.getElementById('loading');
+const receiptWrap = document.getElementById('receiptWrap');
+const receipt = document.getElementById('receipt');
+
+function stamp(){
+  const d = new Date();
+  return d.toLocaleString('en-PH', { dateStyle:'medium', timeStyle:'short' });
+}
+
+function maskEmail(email){
+  const [user, domain] = email.split('@');
+  if(!domain) return email;
+  const shown = user.slice(0, Math.min(2, user.length));
+  return `${shown}${'•'.repeat(Math.max(user.length - shown.length,3))}@${domain}`;
+}
+
+function renderSafe(email){
+  receipt.innerHTML = `
+    <div class="r-head">
+      <div class="mark">Result</div>
+      <div class="verdict safe">No breach found</div>
+    </div>
+    <div class="r-body">
+      <div class="r-row"><span class="k">Email checked</span><span class="v">${maskEmail(email)}</span></div>
+      <div class="r-row"><span class="k">Checked at</span><span class="v">${stamp()}</span></div>
+      <div class="r-row"><span class="k">Source</span><span class="v">XposedOrNot public index</span></div>
+      <ul class="steps">
+        <li>Not every breach is discovered or made public, so this isn't a guarantee — keep using unique passwords and 2FA regardless.</li>
+        <li>Re-check occasionally; new breaches get added over time.</li>
+      </ul>
+    </div>
+    <div class="r-foot">
+      <p class="stub">SINTA · NO DATA RETAINED · ${new Date().getTime().toString().slice(-8)}</p>
+    </div>
+  `;
+  showReceipt();
+}
+
+function renderBreached(email, breaches){
+  const chips = breaches.map(b => `<li>${b}</li>`).join('');
+  receipt.innerHTML = `
+    <div class="r-head">
+      <div class="mark">Result</div>
+      <div class="verdict danger">Found in ${breaches.length} breach${breaches.length>1?'es':''}</div>
+    </div>
+    <div class="r-body">
+      <div class="r-row"><span class="k">Email checked</span><span class="v">${maskEmail(email)}</span></div>
+      <div class="r-row"><span class="k">Checked at</span><span class="v">${stamp()}</span></div>
+      <ul class="breach-list">${chips}</ul>
+      <ul class="steps">
+        <li>Change the password for this email on any of the listed services — and anywhere else you reused it.</li>
+        <li>Turn on two-factor authentication (2FA) on this email account first, then on your banking and GCash/Maya apps.</li>
+        <li>Be extra wary of texts or calls referencing your name, address, or this email — leaked data is often used to make scams sound convincing.</li>
+        <li>Never share OTPs. Banks and the NPC will never ask for one.</li>
+      </ul>
+    </div>
+    <div class="r-foot">
+      <p>Listed sites are where public breach records show this email appeared — it does not mean those sites did anything wrong now, only that your data was exposed at some point.</p>
+      <p class="stub">SINTA · NO DATA RETAINED · ${new Date().getTime().toString().slice(-8)}</p>
+    </div>
+  `;
+  showReceipt();
+}
+
+function renderError(msg){
+  receipt.innerHTML = `
+    <div class="r-head">
+      <div class="mark">Result</div>
+      <div class="verdict err">Couldn't complete check</div>
+    </div>
+    <div class="r-body">
+      <div class="r-row"><span class="k">Reason</span><span class="v">${msg}</span></div>
+      <ul class="steps">
+        <li>The lookup service may be rate-limiting or briefly unavailable — wait a moment and try again.</li>
+        <li>You can also check directly at xposedornot.com or haveibeenpwned.com.</li>
+      </ul>
+    </div>
+  `;
+  showReceipt();
+}
+
+function showReceipt(){
+  loading.classList.remove('show');
+  receiptWrap.classList.add('show');
+}
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = input.value.trim();
+  if(!email) return;
+
+  btn.disabled = true;
+  btn.textContent = '...';
+  receiptWrap.classList.remove('show');
+  loading.classList.add('show');
+
+  try{
+    const res = await fetch(`https://api.xposedornot.com/v1/check-email/${encodeURIComponent(email)}`);
+
+    if(res.status === 404){
+      renderSafe(email);
+    } else if(res.ok){
+      const data = await res.json();
+      if(data && data.breaches && data.breaches[0] && data.breaches[0].length){
+        renderBreached(email, data.breaches[0]);
+      } else {
+        renderSafe(email);
+      }
+    } else if(res.status === 429){
+      renderError('too many checks right now — please wait a bit and try again.');
+    } else {
+      renderError(`lookup service returned an error (status ${res.status}).`);
+    }
+  } catch(err){
+    renderError('could not reach the lookup service. Check your connection and try again.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Check';
+  }
+});
+</script>
+</body>
+</html>
