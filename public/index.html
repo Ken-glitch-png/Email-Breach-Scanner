@@ -20,7 +20,6 @@
     --danger:#B5432B;
     --danger-bg:#FBEAE3;
     --line:#D9D2BE;
-    --radius:2px;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -32,19 +31,36 @@
     display:flex;
     flex-direction:column;
     align-items:center;
-    padding:48px 20px 80px;
+    padding:0 20px 80px;
   }
   @media (prefers-reduced-motion: reduce){
     *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;}
   }
 
-  .brandbar{
+  .col{width:100%;max-width:560px;}
+  .col-wide{width:100%;max-width:720px;}
+
+  @media (min-width:900px){
+    .col{max-width:600px;}
+    .col-wide{max-width:800px;}
+  }
+
+  /* ---- nav ---- */
+  nav{
+    width:100%;
+    max-width:920px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:26px 0 0;
+    position:relative;
+  }
+  .brand{
     display:flex;
     align-items:center;
     gap:10px;
-    margin-bottom:36px;
   }
-  .brandbar .mark{
+  .brand .mark{
     width:26px;height:26px;
     border:1.5px solid var(--navy);
     border-radius:50%;
@@ -53,42 +69,111 @@
     font-size:14px;
     color:var(--navy);
   }
-  .brandbar span{
+  .brand span{
     font-family:'IBM Plex Mono',monospace;
     font-size:12px;
     letter-spacing:0.14em;
     text-transform:uppercase;
     color:var(--ink-soft);
   }
+  .nav-right{position:relative;}
+  .about-toggle{
+    background:none;
+    border:none;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:13px;
+    color:var(--navy);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 0;
+  }
+  .about-toggle svg{
+    width:11px;height:11px;
+    transition:transform 0.2s ease;
+  }
+  .about-toggle[aria-expanded="true"] svg{transform:rotate(180deg);}
+
+  .about-panel{
+    position:absolute;
+    top:calc(100% + 12px);
+    right:0;
+    width:min(88vw, 380px);
+    background:#fff;
+    border:1px solid var(--line);
+    box-shadow:0 18px 40px -20px rgba(18,33,58,0.35);
+    padding:22px 24px;
+    display:none;
+    z-index:20;
+  }
+  .about-panel.show{display:block;animation:drop 0.18s ease both;}
+  @keyframes drop{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+  .about-panel h3{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:16px;
+    color:var(--navy);
+    margin:0 0 10px;
+  }
+  .about-panel p{
+    font-size:13px;
+    line-height:1.65;
+    color:var(--ink);
+    margin:0 0 12px;
+  }
+  .about-panel p:last-child{margin-bottom:0;}
+  .about-panel .divider{
+    border:none;
+    border-top:1px dashed var(--line);
+    margin:14px 0;
+  }
+  .about-panel .privacy-note{
+    font-size:12px;
+    color:var(--ink-soft);
+    line-height:1.6;
+  }
+  .about-panel .privacy-note strong{color:var(--ink);}
+
+  main{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    width:100%;
+    padding-top:48px;
+  }
+  @media (min-width:900px){
+    main{padding-top:64px;}
+  }
 
   h1{
     font-family:'Fraunces',serif;
     font-optical-sizing:auto;
     font-weight:500;
-    font-size:clamp(32px,5vw,46px);
+    font-size:clamp(32px,4.2vw,54px);
     line-height:1.08;
     letter-spacing:-0.01em;
     color:var(--navy);
     text-align:center;
-    max-width:620px;
-    margin:0 0 14px;
+    max-width:720px;
+    margin:0 0 16px;
   }
   h1 em{
     font-style:italic;
     color:var(--gold);
   }
   .sub{
-    font-size:15px;
+    font-size:clamp(15px,1.1vw,17px);
     color:var(--ink-soft);
     text-align:center;
-    max-width:480px;
-    line-height:1.55;
+    max-width:560px;
+    line-height:1.6;
     margin:0 0 40px;
   }
 
   form{
     width:100%;
-    max-width:480px;
     display:flex;
     gap:0;
     border:1.5px solid var(--navy);
@@ -121,19 +206,21 @@
   button:disabled{opacity:0.55;cursor:default;}
   button:focus-visible, input:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
 
-  .consent{
-    max-width:480px;
-    width:100%;
+  .consent-mini{
     font-size:12.5px;
     color:var(--ink-soft);
     margin-top:12px;
     line-height:1.5;
   }
+  .consent-mini button{
+    background:none;border:none;padding:0;
+    font:inherit;color:var(--ink-soft);
+    text-decoration:underline;cursor:pointer;
+  }
 
-  /* ---- receipt ---- */
   .receipt-wrap{
     width:100%;
-    max-width:420px;
+    max-width:480px;
     margin-top:44px;
     display:none;
   }
@@ -256,9 +343,94 @@
   }
   .loading.show{display:block;}
 
+  /* ---- Latest Breaches ---- */
+  section.block{
+    margin-top:88px;
+    width:100%;
+  }
+  .block-head{
+    text-align:center;
+    margin-bottom:32px;
+  }
+  .block-head .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-bottom:8px;
+  }
+  .block-head h2{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:clamp(24px,3vw,32px);
+    color:var(--navy);
+    margin:0;
+  }
+
+  .breach-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:14px;
+  }
+  @media (min-width:700px){
+    .breach-grid{grid-template-columns:1fr 1fr;}
+  }
+
+  .breach-card{
+    background:#fff;
+    border:1px solid var(--line);
+    padding:18px 20px;
+  }
+  .breach-card .bc-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    gap:10px;
+    margin-bottom:8px;
+  }
+  .breach-card .bc-name{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:16px;
+    color:var(--navy);
+  }
+  .breach-card .bc-date{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+    white-space:nowrap;
+  }
+  .breach-card p{
+    font-size:12.5px;
+    line-height:1.55;
+    color:var(--ink-soft);
+    margin:0 0 10px;
+    display:-webkit-box;
+    -webkit-line-clamp:3;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+  }
+  .breach-card .bc-meta{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--danger);
+    background:var(--danger-bg);
+    display:inline-block;
+    padding:3px 8px;
+    border:1px solid #EFCFC0;
+  }
+  .breach-empty{
+    text-align:center;
+    font-size:13.5px;
+    color:var(--ink-soft);
+    padding:20px 0;
+    grid-column:1 / -1;
+  }
+
   footer{
-    margin-top:56px;
-    max-width:480px;
+    margin-top:80px;
+    max-width:560px;
     text-align:center;
     font-size:11.5px;
     color:#9C9788;
@@ -269,25 +441,52 @@
 </head>
 <body>
 
-  <div class="brandbar">
-    <div class="mark">S</div>
-    <span>Sinta · Digital Safety Check</span>
-  </div>
+  <nav>
+    <div class="brand">
+      <div class="mark">S</div>
+      <span>Sinta · Digital Safety Check</span>
+    </div>
+    <div class="nav-right">
+      <button class="about-toggle" id="aboutToggle" aria-expanded="false" aria-controls="aboutPanel">
+        About
+        <svg viewBox="0 0 12 8" fill="none"><path d="M1 1L6 6L11 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="about-panel" id="aboutPanel">
+        <h3>Why Sinta exists</h3>
+        <p>Sinta was built for people in the Philippines dealing with a rising wave of scams that lean on leaked personal data — a text that knows your name, a call that knows your address. Knowing whether your email has already been exposed is the first step to protecting yourself.</p>
+        <p>This is a small, independent tool — not a bank, telco, or government service.</p>
+        <hr class="divider">
+        <p class="privacy-note"><strong>How your privacy is handled:</strong> By checking, your email is sent directly from your browser to XposedOrNot, a free public breach-lookup service, over an encrypted connection. This tool keeps no copy of what you search or the results.</p>
+      </div>
+    </div>
+  </nav>
 
-  <h1>Has your email been part of a <em>data leak?</em></h1>
-  <p class="sub">Check your email against known public data-breach records. Nothing you type here is stored, logged, or sent anywhere except the breach-lookup service itself.</p>
+  <main>
+    <h1>Has your email been part of a <em>data leak?</em></h1>
+    <p class="sub">Check your email against known public data-breach records. Nothing you type here is stored, logged, or sent anywhere except the breach-lookup service itself.</p>
 
-  <form id="checkForm">
-    <input type="email" id="emailInput" placeholder="juan.delacruz@gmail.com" required autocomplete="off" spellcheck="false">
-    <button type="submit" id="checkBtn">Check</button>
-  </form>
-  <p class="consent">By checking, your email is sent directly from your browser to <strong>XposedOrNot</strong>, a free public breach-lookup service, over an encrypted connection. This tool keeps no copy.</p>
+    <form id="checkForm" class="col">
+      <input type="email" id="emailInput" placeholder="juan.delacruz@gmail.com" required autocomplete="off" spellcheck="false">
+      <button type="submit" id="checkBtn">Check</button>
+    </form>
+    <p class="consent-mini col">Your email goes straight to the breach-lookup service, nothing is stored here — see <button type="button" id="aboutLink">About</button> for details.</p>
 
-  <div class="loading" id="loading">checking public breach records …</div>
+    <div class="loading" id="loading">checking public breach records …</div>
 
-  <div class="receipt-wrap" id="receiptWrap">
-    <div class="receipt" id="receipt"></div>
-  </div>
+    <div class="receipt-wrap" id="receiptWrap">
+      <div class="receipt" id="receipt"></div>
+    </div>
+
+    <section class="block col-wide" id="breaches">
+      <div class="block-head">
+        <div class="eyebrow">Live Index</div>
+        <h2>Latest known breaches</h2>
+      </div>
+      <div class="breach-grid" id="breachGrid">
+        <p class="breach-empty">Loading recent breaches…</p>
+      </div>
+    </section>
+  </main>
 
   <footer>
     Not a replacement for official advice. If money or a government ID was involved, report to the <a href="https://www.pnpacg.ph/" target="_blank" rel="noopener">PNP Anti-Cybercrime Group</a> or file a complaint with the <a href="https://www.privacy.gov.ph/" target="_blank" rel="noopener">National Privacy Commission</a>. Breach data via XposedOrNot's free public API.
@@ -417,6 +616,83 @@ form.addEventListener('submit', async (e) => {
     btn.textContent = 'Check';
   }
 });
+
+/* ===== About dropdown ===== */
+const aboutToggle = document.getElementById('aboutToggle');
+const aboutPanel = document.getElementById('aboutPanel');
+const aboutLink = document.getElementById('aboutLink');
+
+function toggleAbout(open){
+  const willOpen = open !== undefined ? open : !aboutPanel.classList.contains('show');
+  aboutPanel.classList.toggle('show', willOpen);
+  aboutToggle.setAttribute('aria-expanded', String(willOpen));
+}
+
+aboutToggle.addEventListener('click', () => toggleAbout());
+aboutLink.addEventListener('click', () => {
+  toggleAbout(true);
+  aboutPanel.scrollIntoView({ behavior:'smooth', block:'nearest' });
+});
+document.addEventListener('click', (e) => {
+  if(!e.target.closest('.nav-right')) toggleAbout(false);
+});
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape') toggleAbout(false);
+});
+
+/* ===== Latest breaches ===== */
+const breachGrid = document.getElementById('breachGrid');
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function formatBreachDate(iso){
+  if(!iso) return '';
+  return new Date(iso).toLocaleDateString('en-PH', { year:'numeric', month:'short' });
+}
+
+function formatRecords(n){
+  if(!n) return '';
+  if(n >= 1e6) return (n/1e6).toFixed(1).replace(/\.0$/,'') + 'M records';
+  if(n >= 1e3) return Math.round(n/1e3) + 'K records';
+  return n + ' records';
+}
+
+async function loadBreaches(){
+  try{
+    const res = await fetch('https://api.xposedornot.com/v1/breaches');
+    if(!res.ok) throw new Error('failed');
+    const data = await res.json();
+    const list = data.exposedBreaches || [];
+
+    if(list.length === 0){
+      breachGrid.innerHTML = '<p class="breach-empty">No breach data available right now.</p>';
+      return;
+    }
+
+    // newest first by addedDate, show a handful
+    const sorted = [...list].sort((a,b) => new Date(b.addedDate) - new Date(a.addedDate)).slice(0, 8);
+
+    breachGrid.innerHTML = sorted.map(b => `
+      <div class="breach-card">
+        <div class="bc-top">
+          <span class="bc-name">${escapeHtml(b.breachID || b.domain || 'Unknown')}</span>
+          <span class="bc-date">${formatBreachDate(b.breachedDate)}</span>
+        </div>
+        <p>${escapeHtml(b.exposureDescription || 'No description available.')}</p>
+        <span class="bc-meta">${formatRecords(b.exposedRecords)}</span>
+      </div>
+    `).join('');
+
+  } catch(err){
+    breachGrid.innerHTML = '<p class="breach-empty">Couldn\'t load breach data right now. Try refreshing.</p>';
+  }
+}
+
+loadBreaches();
 </script>
 </body>
 </html>
