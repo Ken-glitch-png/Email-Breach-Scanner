@@ -24,7 +24,14 @@
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
-    background:var(--paper);
+    background-color:var(--paper);
+    background-image:
+      radial-gradient(38% 32% at 20% 22%, rgba(201,138,46,0.20), transparent 60%),
+      radial-gradient(42% 36% at 82% 68%, rgba(18,33,58,0.16), transparent 60%);
+    background-size:220% 220%, 220% 220%;
+    background-position:0% 0%, 100% 100%;
+    background-repeat:no-repeat;
+    animation:driftBg 14s ease-in-out infinite alternate;
     color:var(--ink);
     font-family:'Inter',system-ui,sans-serif;
     min-height:100vh;
@@ -33,6 +40,11 @@
     align-items:center;
     padding:0 20px 80px;
     position:relative;
+  }
+  @keyframes driftBg{
+    0%  {background-position:0% 0%, 100% 100%;}
+    50% {background-position:35% 45%, 55% 65%;}
+    100%{background-position:65% 15%, 25% 90%;}
   }
   /* subtle paper grain — reinforces the receipt/paper concept instead of a flat fill */
   body::before{
@@ -47,6 +59,7 @@
   }
   nav, main, footer{position:relative;z-index:1;}
   @media (prefers-reduced-motion: reduce){
+    body{animation:none;}
     *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;}
   }
 
@@ -395,14 +408,10 @@
     border:1px solid var(--line);
     padding:18px 20px;
     cursor:pointer;
-    transition:border-color 0.15s ease, box-shadow 0.15s ease;
+    transition:border-color 0.15s ease, transform 0.15s ease;
   }
-  .breach-card:hover{border-color:var(--navy);}
+  .breach-card:hover{border-color:var(--navy);transform:translateY(-2px);}
   .breach-card:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
-  .breach-card.expanded{
-    box-shadow:0 12px 28px -18px rgba(18,33,58,0.35);
-    grid-column:1 / -1;
-  }
   .breach-card .bc-top{
     display:flex;
     justify-content:space-between;
@@ -432,10 +441,6 @@
     -webkit-box-orient:vertical;
     overflow:hidden;
   }
-  .breach-card.expanded p{
-    -webkit-line-clamp:unset;
-    overflow:visible;
-  }
   .breach-card .bc-meta{
     font-family:'IBM Plex Mono',monospace;
     font-size:11px;
@@ -445,50 +450,6 @@
     padding:3px 8px;
     border:1px solid #EFCFC0;
   }
-  .breach-card .bc-detail{
-    display:none;
-    margin-top:14px;
-    padding-top:14px;
-    border-top:1px dashed var(--line);
-  }
-  .breach-card.expanded .bc-detail{display:block;}
-  .breach-card .bc-data-list{
-    list-style:none;
-    margin:10px 0 0;
-    padding:0;
-    display:flex;
-    flex-wrap:wrap;
-    gap:6px;
-  }
-  .breach-card .bc-data-list li{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:10.5px;
-    color:var(--ink-soft);
-    background:var(--paper-dim);
-    padding:3px 8px;
-    border:1px solid var(--line);
-  }
-  .breach-card .bc-domain{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:11.5px;
-    color:var(--ink-soft);
-  }
-  .breach-card .bc-ref{
-    display:inline-block;
-    margin-top:12px;
-    font-size:12px;
-    color:var(--navy);
-    font-weight:600;
-    text-decoration:none;
-  }
-  .breach-card .bc-ref:hover{text-decoration:underline;}
-  .breach-card .bc-close-hint{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:10.5px;
-    color:#B4AF9E;
-    margin-top:14px;
-    text-align:center;
-  }
   .breach-empty{
     text-align:center;
     font-size:13.5px;
@@ -496,6 +457,127 @@
     padding:20px 0;
     grid-column:1 / -1;
   }
+
+  /* ---- breach detail modal ---- */
+  .modal-backdrop{
+    position:fixed;
+    inset:0;
+    background:rgba(18,33,58,0.5);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    z-index:100;
+  }
+  .modal-backdrop.show{display:flex;animation:fadeIn 0.15s ease both;}
+  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+
+  .modal-box{
+    background:#fff;
+    border:1px solid var(--line);
+    max-width:520px;
+    width:100%;
+    max-height:82vh;
+    overflow-y:auto;
+    box-shadow:0 30px 60px -20px rgba(18,33,58,0.5);
+    animation:popIn 0.22s cubic-bezier(0.2,0.9,0.3,1.2) both;
+  }
+  @keyframes popIn{
+    from{opacity:0;transform:scale(0.92) translateY(8px);}
+    to{opacity:1;transform:scale(1) translateY(0);}
+  }
+  .modal-head{
+    padding:22px 26px 16px;
+    border-bottom:1px dashed var(--line);
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:14px;
+  }
+  .modal-head .mh-name{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:20px;
+    color:var(--navy);
+    margin:0 0 4px;
+  }
+  .modal-head .mh-date{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    color:var(--ink-soft);
+  }
+  .modal-close{
+    background:var(--paper-dim);
+    border:1px solid var(--line);
+    width:30px;height:30px;
+    flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    font-size:16px;
+    color:var(--ink-soft);
+    line-height:1;
+  }
+  .modal-close:hover{background:var(--line);color:var(--ink);}
+  .modal-body{padding:20px 26px 24px;}
+  .modal-body p{
+    font-size:13.5px;
+    line-height:1.65;
+    color:var(--ink);
+    margin:0 0 16px;
+  }
+  .modal-body .mb-domain{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-bottom:14px;
+  }
+  .modal-body .bc-meta{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--danger);
+    background:var(--danger-bg);
+    display:inline-block;
+    padding:3px 8px;
+    border:1px solid #EFCFC0;
+    margin-bottom:16px;
+  }
+  .modal-body .bc-data-list{
+    list-style:none;
+    margin:0 0 16px;
+    padding:0;
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  .modal-body .bc-data-list li{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    color:var(--ink-soft);
+    background:var(--paper-dim);
+    padding:3px 8px;
+    border:1px solid var(--line);
+  }
+  .modal-body .bc-ref{
+    display:inline-block;
+    font-size:12.5px;
+    color:var(--navy);
+    font-weight:600;
+    text-decoration:none;
+    margin-bottom:20px;
+  }
+  .modal-body .bc-ref:hover{text-decoration:underline;}
+  .modal-back{
+    width:100%;
+    padding:12px;
+    background:var(--navy);
+    color:var(--paper);
+    border:none;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:13.5px;
+    cursor:pointer;
+  }
+  .modal-back:hover{background:var(--navy-soft);}
 
   footer{
     margin-top:80px;
@@ -560,6 +642,19 @@
   <footer>
     Not a replacement for official advice. If money or a government ID was involved, report to the <a href="https://www.pnpacg.ph/" target="_blank" rel="noopener">PNP Anti-Cybercrime Group</a> or file a complaint with the <a href="https://www.privacy.gov.ph/" target="_blank" rel="noopener">National Privacy Commission</a>. Breach data via XposedOrNot's free public API.
   </footer>
+
+  <div class="modal-backdrop" id="breachModal">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalName">
+      <div class="modal-head">
+        <div>
+          <p class="mh-name" id="modalName"></p>
+          <span class="mh-date" id="modalDate"></span>
+        </div>
+        <button class="modal-close" id="modalCloseX" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
 
 <script>
 const form = document.getElementById('checkForm');
@@ -711,6 +806,13 @@ document.addEventListener('keydown', (e) => {
 
 /* ===== Latest breaches ===== */
 const breachGrid = document.getElementById('breachGrid');
+const breachModal = document.getElementById('breachModal');
+const modalName = document.getElementById('modalName');
+const modalDate = document.getElementById('modalDate');
+const modalBody = document.getElementById('modalBody');
+const modalCloseX = document.getElementById('modalCloseX');
+let latestBreaches = [];
+let lastFocusedCard = null;
 
 function escapeHtml(str){
   const div = document.createElement('div');
@@ -730,6 +832,44 @@ function formatRecords(n){
   return n + ' records';
 }
 
+function openBreachModal(b){
+  if(!b) return;
+  lastFocusedCard = document.activeElement;
+
+  modalName.textContent = b.breachID || b.domain || 'Unknown';
+  modalDate.textContent = formatBreachDate(b.breachedDate);
+
+  modalBody.innerHTML = `
+    ${b.domain ? `<div class="mb-domain">${escapeHtml(b.domain)}</div>` : ''}
+    <span class="bc-meta">${formatRecords(b.exposedRecords)}</span>
+    <p>${escapeHtml(b.exposureDescription || 'No description available.')}</p>
+    ${Array.isArray(b.exposedData) && b.exposedData.length ? `
+      <ul class="bc-data-list">
+        ${b.exposedData.map(d => `<li>${escapeHtml(d)}</li>`).join('')}
+      </ul>
+    ` : ''}
+    ${b.referenceURL ? `<a class="bc-ref" href="${escapeHtml(b.referenceURL)}" target="_blank" rel="noopener">Read source report ↗</a>` : ''}
+    <button class="modal-back" id="modalBackBtn">← Back to list</button>
+  `;
+
+  breachModal.classList.add('show');
+  document.getElementById('modalBackBtn').addEventListener('click', closeBreachModal);
+  modalCloseX.focus();
+}
+
+function closeBreachModal(){
+  breachModal.classList.remove('show');
+  if(lastFocusedCard) lastFocusedCard.focus();
+}
+
+modalCloseX.addEventListener('click', closeBreachModal);
+breachModal.addEventListener('click', (e) => {
+  if(e.target === breachModal) closeBreachModal();
+});
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape' && breachModal.classList.contains('show')) closeBreachModal();
+});
+
 async function loadBreaches(){
   try{
     const res = await fetch('https://api.xposedornot.com/v1/breaches');
@@ -744,36 +884,24 @@ async function loadBreaches(){
 
     // newest first by addedDate, show a handful
     const sorted = [...list].sort((a,b) => new Date(b.addedDate) - new Date(a.addedDate)).slice(0, 8);
+    latestBreaches = sorted;
 
     breachGrid.innerHTML = sorted.map((b, i) => `
-      <div class="breach-card" tabindex="0" role="button" aria-expanded="false" data-idx="${i}">
+      <div class="breach-card" tabindex="0" role="button" data-idx="${i}">
         <div class="bc-top">
           <span class="bc-name">${escapeHtml(b.breachID || b.domain || 'Unknown')}</span>
           <span class="bc-date">${formatBreachDate(b.breachedDate)}</span>
         </div>
         <p>${escapeHtml(b.exposureDescription || 'No description available.')}</p>
         <span class="bc-meta">${formatRecords(b.exposedRecords)}</span>
-        <div class="bc-detail">
-          ${b.domain ? `<div class="bc-domain">${escapeHtml(b.domain)}</div>` : ''}
-          ${Array.isArray(b.exposedData) && b.exposedData.length ? `
-            <ul class="bc-data-list">
-              ${b.exposedData.map(d => `<li>${escapeHtml(d)}</li>`).join('')}
-            </ul>
-          ` : ''}
-          ${b.referenceURL ? `<a class="bc-ref" href="${escapeHtml(b.referenceURL)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Read source report ↗</a>` : ''}
-          <div class="bc-close-hint">Click to collapse</div>
-        </div>
       </div>
     `).join('');
 
     breachGrid.querySelectorAll('.breach-card').forEach(card => {
-      const toggle = () => {
-        const isExpanded = card.classList.toggle('expanded');
-        card.setAttribute('aria-expanded', String(isExpanded));
-      };
-      card.addEventListener('click', toggle);
+      const open = () => openBreachModal(latestBreaches[parseInt(card.dataset.idx, 10)]);
+      card.addEventListener('click', open);
       card.addEventListener('keydown', (e) => {
-        if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggle(); }
+        if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); open(); }
       });
     });
 
