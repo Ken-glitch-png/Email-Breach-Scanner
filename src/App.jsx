@@ -16,11 +16,11 @@ export default function App() {
     <div className="page">
       <div className="brandbar">
         <div className="mark">S</div>
-        <span>Sinta Tools</span>
+        <span>Sinta</span>
       </div>
 
-      <h1>Extra tools to stay <em>a step ahead</em></h1>
-      <p className="sub">Two more ways to check before you click or share.</p>
+      <h1>Stay <em>a step ahead</em> of scams and leaks</h1>
+      <p className="sub">Check your email, your passwords, and suspicious links — then scan files and get a disposable inbox, all in one place.</p>
 
       <div className="tabbar">
         {TABS.map((t) => (
